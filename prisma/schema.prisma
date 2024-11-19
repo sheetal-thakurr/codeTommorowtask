@@ -1,0 +1,58 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Category {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  name     String   @db.VarChar(255)
+  services  Service[]
+    
+}
+
+
+
+model Service {
+  id          Int             @id @default(autoincrement())
+  name        String          @db.VarChar(255) // Service name
+  category_id Int
+  category    Category        @relation(fields: [category_id], references: [id])
+  type        ServiceTypeEnum @default(Normal)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  ServicePrice ServicePrice[] 
+}
+
+model ServicePrice {
+  id         Int               @id @default(autoincrement())
+  service_id Int
+  service    Service           @relation(fields: [service_id], references: [id])
+  duration   String?          @db.VarChar(255) 
+  price      Float             
+  type       DurationTypeEnum  @default(Hourly) 
+  createdAt  DateTime          @default(now())
+  updatedAt  DateTime          @updatedAt
+}
+
+enum ServiceTypeEnum {
+  Normal
+  VIP
+}
+
+enum DurationTypeEnum {
+  Hourly
+  Weekly
+  Monthly
+}
